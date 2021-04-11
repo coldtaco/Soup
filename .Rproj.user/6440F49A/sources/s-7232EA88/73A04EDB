@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1618125655594.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2082943624",
+    "id" : "73A04EDB",
+    "lastKnownWriteTime" : 1618134238,
+    "last_content_update" : 1618134238877,
+    "path" : "C:/Users/Yuhan/Desktop/Soup/Summary.Rmd",
+    "project_path" : "Summary.Rmd",
+    "properties" : {
+        "cursorPosition" : "1,26",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

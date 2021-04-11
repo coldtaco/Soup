@@ -1,0 +1,50 @@
+---
+title: Aggregation of cast
+output: html_document
+author: coldtaco
+---
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(plotly)
+```
+Here are a few plots created from data collected by user `chinasoupnumbawan` on Twtich from a `!cast` command on [SingSing's Twitch channel](https://twitch.tv/singsing)
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+df = read_csv('fishing_data.csv', col_names = c('time', 'user', 'caught', 'points'))
+df$time = as.POSIXct(df$time, origin="1970-01-01")
+df$hour = factor(hour(df$time))
+(ggplot(df, aes(x = hour)) + geom_histogram(stat = 'count') + labs(title = 'Number of casts by time of day', x = 'Time of day (UTC)', y = 'Number of casts')) %>% ggplotly()
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+userCounts = df %>% count(df$user) %>% arrange(desc(n)) %>% head(20)
+colnames(userCounts) <- c('user', 'n')
+userCounts$user <- factor(userCounts$user, levels = userCounts$user[order(desc(userCounts$n))])
+(ggplot(userCounts, aes(x = user, y = n)) + geom_histogram(stat = 'identity') + labs(title = 'Number of casts by user', x = 'User', y = 'Number of casts') + theme(axis.text.x = element_text(angle = 45))) %>% ggplotly()
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+HoraDecimal <- function(x){
+  (hour(x) + minute(x)/60 + second(x)/3600)
+}
+getSD <- function(x){
+  c(sd = sd(x-mean(x)))
+}
+UTC8 <- function(x){
+  x = x+8
+  if (x > 24){
+    x = x - 24
+  }
+  x
+}
+variance = aggregate(.~user, df[,c('user','hour')], getSD)
+noLifers = variance %>% arrange(desc(hour)) %>% head(20)
+topNoLifers = df[df$user %in% noLifers$user,]
+topNoLifers$user <- factor(topNoLifers$user, levels = noLifers$user[order(desc(noLifers$hour))])
+topNoLifers = cbind(topNoLifers[, -c(5)], lapply(topNoLifers[,c('time')], HoraDecimal) %>% data.frame)
+topNoLifers = data.frame(topNoLifers[,-c(5)], apply(topNoLifers[5],1, UTC8))
+colnames(topNoLifers) <- colnames(df)
+(ggplot(topNoLifers, aes(x = user, y = hour)) + geom_boxplot() + labs(title = 'Top 20 users with greatest variance in time of day of casting', x = 'User', y = 'Time of day (UTC+8)') + geom_jitter() + coord_flip()) %>% ggplotly()
+```
